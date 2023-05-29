@@ -1,0 +1,15 @@
+ID;CHECK;CHECKINGPEER;STATE;TIME
+1;1;Kasko;Start;14:36:12
+2;2;Monk;Start;12:19:45
+3;7;Lu;Start;11:36:12
+4;6;Pillow;Start;15:53:16
+5;4;Pillow;Start;09:46:55
+6;5;Lu;Start;13:56:06
+7;3;Bonk;Start;20:30:22
+8;1;Kasko;Success;15:06:12
+9;2;Monk;Success;12:44:45
+10;7;Lu;Success;11:46:12
+11;6;Pillow;Failure;16:11:16
+12;4;Pillow;Success;10:10:55
+13;5;Lu;Success;14:22:06
+14;3;Bonk;Failure;20:51:22

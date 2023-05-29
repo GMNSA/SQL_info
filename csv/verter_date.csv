@@ -1,0 +1,11 @@
+ID;CHECK;STATE;TIME
+1;1;Start;23:18:48
+2;1;Success;23:20:23
+3;2;Start;22:49:28
+4;2;Success;22:54:46
+5;3;Start;22:56:31
+6;3;Success;23:02:49
+7;4;Start;23:04:25
+8;4;Failure;23:05:42
+9;5;Start;22:59:01
+10;5;Success;23:06:12

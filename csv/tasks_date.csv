@@ -1,0 +1,11 @@
+Task;Condition;Xp
+С1_SimpleBashUtils;;250
+С2_s21_string;С1_SimpleBashUtils;500
+С3_s21_math;С2_s21_string;300
+С4_s21_decimal;С3_s21_math;350
+С5_s21_matrix;С4_s21_decimal;200
+С6_SmartCalc_v1.0;С5_s21_matrix;500
+С7_3DViewer_v1.0;С6_SmartCalc_v1.0;750
+DO1_Linux;С1_SimpleBashUtils;300
+DO2_Network;DO1_Linux;350
+DO3_Monitoring;DO2_Network;300
