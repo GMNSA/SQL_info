@@ -145,13 +145,12 @@ END;
 $$ LANGUAGE plpgsql;
 -- -------------------------------------------- --
 CREATE OR REPLACE FUNCTION fn_trg_recommendations_insert()
-RETURNS trigger AS $$
+RETURNS TRIGGER AS $$
 DECLARE
     is_equal_peer BOOL := ((SELECT COUNT(*) FROM Recommendations
             WHERE NEW.Peer = Recommendations.Peer AND
                   NEW.RecommendedPeer = Recommendations.RecommendedPeer) > 0);
 BEGIN
-    -- TODO: release condition
     IF (NEW.Peer = NEW.RecommendedPeer OR is_equal_peer) THEN
         RETURN NULL;
     ELSE
@@ -159,7 +158,24 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+-- -------------------------------------------- --
+CREATE OR REPLACE FUNCTION fn_trg_friends_insert()
+RETURNS TRIGGER AS $$
+DECLARE
+    is_equal_friend BOOL := (SELECT COUNT(*) FROM Friends
+                        WHERE ((NEW.Peer1 = Peer2 AND NEW.Peer2 = Peer1) OR
+                              (Peer1 = NEW.Peer1  AND Peer2 = NEW.Peer2))
+                     ) > 0;
 
+BEGIN
+    IF (NEW.Peer1 = NEW.Peer2 OR is_equal_friend) THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql;
 -- # --------------- # TRIGGERS  # --------------# --
 
 CREATE TRIGGER trg_timetracking_insert
@@ -171,6 +187,11 @@ CREATE TRIGGER trg_recommendations_insert
 BEFORE INSERT ON Recommendations
 FOR EACH ROW
 EXECUTE PROCEDURE fn_trg_recommendations_insert();
+-- -------------------------------------------- --
+CREATE TRIGGER trg_friends_insert
+BEFORE INSERT ON Friends
+FOR EACH ROW
+EXECUTE PROCEDURE fn_trg_friends_insert();
 -- -------------------------------------------- --
 -- Таблица Tasks
 -- Название задания
@@ -265,7 +286,6 @@ $create_tables$;
 -- SELECT * FROM Verter            LIMIT 20;
 -- SELECT * FROM TransferredPoints LIMIT 20;
 -- SELECT * FROM Friends           LIMIT 20;
--- SELECT * FROM Friends           LIMIT 19;
 -- SELECT * FROM Recommendations   LIMIT 20;
 -- SELECT * FROM XP                LIMIT 20;
 -- SELECT * FROM TimeTracking      LIMIT 20;

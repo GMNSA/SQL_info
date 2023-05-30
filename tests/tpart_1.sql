@@ -33,7 +33,6 @@ BEGIN
     assert(n_count = 0);
 
     PERFORM fn_print('                    -- [ OK ] --');
---     RAISE NOTICE 'Добавлено % строк', n_count;
 END;
 $$ language plpgsql;
 ROLLBACK;
@@ -79,7 +78,47 @@ BEGIN
 
 
     PERFORM fn_print('                    -- [ OK ] --');
---     RAISE NOTICE 'Добавлено % строк', n_count;
+END;
+$$ language plpgsql;
+ROLLBACK;
+
+-- FRIENDS TEST-------------------------------------------- --
+
+BEGIN;
+DO $$
+DECLARE
+    n_count int;
+    user1 TEXT := 'eviadann';
+    user2 TEXT := 'jackscan';
+BEGIN
+    PERFORM fn_print('-- # -- START TEST trg_recommendations_insert -- # --');
+
+    INSERT INTO Peers VALUES(user1, '1998-01-01');
+    get diagnostics n_count = row_count;
+    assert(n_count = 1);
+
+    INSERT INTO Peers VALUES(user2, '1998-01-01');
+    get diagnostics n_count = row_count;
+    assert(n_count = 1);
+
+    INSERT INTO Friends VALUES(fn_next_id('Friends'), user1, user2);
+    get diagnostics n_count = row_count;
+    assert(n_count = 1);
+
+    INSERT INTO Friends VALUES(fn_next_id('Friends'), user2, user1);
+    get diagnostics n_count = row_count;
+    assert(n_count = 0);
+
+    INSERT INTO Friends VALUES(fn_next_id('Friends'), user1, user2);
+    get diagnostics n_count = row_count;
+    assert(n_count = 0);
+--
+    INSERT INTO Friends VALUES(fn_next_id('Friends'), user2, user1);
+    get diagnostics n_count = row_count;
+    assert(n_count = 0);
+
+
+    PERFORM fn_print('                    -- [ OK ] --');
 END;
 $$ language plpgsql;
 ROLLBACK;
