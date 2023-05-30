@@ -143,7 +143,22 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
-
+-- -------------------------------------------- --
+CREATE OR REPLACE FUNCTION fn_trg_recommendations_insert()
+RETURNS trigger AS $$
+DECLARE
+    is_equal_peer BOOL := ((SELECT COUNT(*) FROM Recommendations
+            WHERE NEW.Peer = Recommendations.Peer AND
+                  NEW.RecommendedPeer = Recommendations.RecommendedPeer) > 0);
+BEGIN
+    -- TODO: release condition
+    IF (NEW.Peer = NEW.RecommendedPeer OR is_equal_peer) THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 -- # --------------- # TRIGGERS  # --------------# --
 
@@ -151,6 +166,11 @@ CREATE TRIGGER trg_timetracking_insert
 BEFORE INSERT ON TimeTracking
 FOR EACH ROW
 EXECUTE PROCEDURE fn_trg_timetracking_insert();
+-- -------------------------------------------- --
+CREATE TRIGGER trg_recommendations_insert
+BEFORE INSERT ON Recommendations
+FOR EACH ROW
+EXECUTE PROCEDURE fn_trg_recommendations_insert();
 -- -------------------------------------------- --
 -- Таблица Tasks
 -- Название задания
