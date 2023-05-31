@@ -2,7 +2,7 @@
 BEGIN;
 DO $$
 DECLARE
-    n_count int;
+    n_count int := 0;
 BEGIN
     PERFORM fn_print('-- # -- START TEST trg_timetracking_insert -- # --');
 
@@ -42,7 +42,7 @@ ROLLBACK;
 BEGIN;
 DO $$
 DECLARE
-    n_count int;
+    n_count int := 0;
     user1 TEXT := 'eviadann';
     user2 TEXT := 'jackscan';
 BEGIN
@@ -87,7 +87,7 @@ ROLLBACK;
 BEGIN;
 DO $$
 DECLARE
-    n_count int;
+    n_count int := 0;
     user1 TEXT := 'eviadann';
     user2 TEXT := 'jackscan';
 BEGIN
@@ -123,5 +123,50 @@ END;
 $$ language plpgsql;
 ROLLBACK;
 
--- SELECT * FROM TimeTracking;
+-- TRANSFERRED_POINTS TEST-------------------------------------------- --
 
+BEGIN;
+DO $$
+DECLARE
+    n_count INT := 0;
+    n_points INT := 5;
+    checkingP TEXT := 'eviadann';
+    checkedP TEXT := 'jackscan';
+    userId SMALLINT := fn_next_id('TransferredPoints');
+
+BEGIN
+    PERFORM fn_print('-- # -- START TEST trg_transferred_insert -- # --');
+
+    INSERT INTO Peers VALUES(checkingP, '1998-01-01');
+    get diagnostics n_count = row_count;
+    assert(n_count = 1);
+
+    INSERT INTO Peers VALUES(checkedP, '1998-01-01');
+    get diagnostics n_count = row_count;
+    assert(n_count = 1);
+
+    INSERT INTO TransferredPoints VALUES(userId, checkingP, checkedP, n_points);
+    get diagnostics n_count = row_count;
+    assert(n_count = 1);
+
+    assert(
+        (
+            SELECT PointsAmount FROM TransferredPoints WHERE id = userId
+        ) = n_points
+    );
+
+    INSERT INTO TransferredPoints VALUES(userId, checkingP, checkedP, n_points);
+    get diagnostics n_count = row_count;
+    assert(n_count = 0);
+
+    assert(
+        (
+            SELECT PointsAmount FROM TransferredPoints WHERE id = userId
+        ) = n_points + 1
+    );
+
+
+    PERFORM fn_print('                    -- [ OK ] --');
+END;
+$$ language plpgsql;
+ROLLBACK;

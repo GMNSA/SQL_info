@@ -1,5 +1,10 @@
 DROP FUNCTION IF EXISTS fn_import_data_from_csv ;
+
+DROP FUNCTION IF EXISTS fn_trg_friends_insert CASCADE;
 DROP FUNCTION IF EXISTS fn_trg_timetracking_insert CASCADE;
+
+DROP FUNCTION IF EXISTS fn_trg_recommendations_insert CASCADE;
+DROP FUNCTION IF EXISTS fn_trg_transferred_points_insert CASCADE;
 
 DROP TABLE IF EXISTS TimeTracking;
 DROP TABLE IF EXISTS XP;
@@ -143,7 +148,9 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
 -- -------------------------------------------- --
+
 CREATE OR REPLACE FUNCTION fn_trg_recommendations_insert()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -158,7 +165,9 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
 -- -------------------------------------------- --
+
 CREATE OR REPLACE FUNCTION fn_trg_friends_insert()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -176,6 +185,31 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
+-- -------------------------------------------- --
+
+CREATE OR REPLACE FUNCTION fn_trg_transferred_points_insert()
+RETURNS TRIGGER AS $$
+DECLARE
+
+BEGIN
+    UPDATE TransferredPoints SET PointsAmount = (PointsAmount + 1) WHERE
+        TransferredPoints.CheckedPeer = NEW.CheckedPeer AND
+        TransferredPoints.CheckingPeer = NEW.CheckingPeer;
+
+
+    IF FOUND THEN
+--         RAISE NOTICE 'Record found';
+        return NULL;
+    ELSE
+--         RAISE NOTICE 'Record NOT found';
+        return NEW;
+    END IF;
+
+
+END;
+$$ LANGUAGE plpgsql;
+
 -- # --------------- # TRIGGERS  # --------------# --
 
 CREATE TRIGGER trg_timetracking_insert
@@ -193,30 +227,10 @@ BEFORE INSERT ON Friends
 FOR EACH ROW
 EXECUTE PROCEDURE fn_trg_friends_insert();
 -- -------------------------------------------- --
--- Таблица Tasks
--- Название задания
--- Название задания, являющегося условием входа
--- Максимальное количество XP
--- Чтобы получить доступ к заданию, нужно выполнить задание, являющееся его условием входа. Для упрощения будем считать, что у каждого задания всего одно условие входа. В таблице должно быть одно задание, у которого нет условия входа (т.е. поле ParentTask равно null).
-
--- CREATE OR REPLACE FUNCTION fnc_trg_check_insert_tasks()
--- RETURNS trigger AS
--- $$
--- DECLARE
---     PT TEXT := (SELECT ParentTask) From Tasks WHERE Title = NEW.Task
--- BEGIN
---
---     IF NOT EXISTS (PT) THEN
---         RETURN NEW;
---     ELSE
---         RETURN NULL;
---     END IF
---
---
--- RETURN N;
---
--- END $$
--- LANGUAGE 'plpgsql';
+CREATE TRIGGER trg_transferred_points_insert
+BEFORE INSERT ON TransferredPoints
+FOR EACH ROW
+EXECUTE PROCEDURE fn_trg_transferred_points_insert();
 
 -- # --------------- # USE FUNCTIONS # --------------- # --
 
@@ -277,6 +291,7 @@ PERFORM fn_import_data_from_csv('TimeTracking',
 END;
 $create_tables$;
 
+-- # --------------- # OUTPUT TABLES # --------------- # --
 
 -- SELECT * FROM Peers             LIMIT 20;
 -- SELECT * FROM Tasks             LIMIT 20;
