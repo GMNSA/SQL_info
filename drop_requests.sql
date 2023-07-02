@@ -1,0 +1,24 @@
+DROP PROCEDURE IF EXISTS pr_import_data_from_csv;
+DROP PROCEDURE IF EXISTS pr_export_data_from_csv;
+
+DROP TABLE IF EXISTS TimeTracking CASCADE;
+DROP TABLE IF EXISTS XP CASCADE;
+DROP TABLE IF EXISTS Recommendations CASCADE;
+DROP TABLE IF EXISTS Friends CASCADE;
+DROP TABLE IF EXISTS TransferredPoints CASCADE;
+DROP TABLE IF EXISTS Verter CASCADE;
+DROP TABLE IF EXISTS P2P CASCADE;
+DROP TABLE IF EXISTS Checks CASCADE;
+DROP TABLE IF EXISTS Tasks CASCADE;
+DROP TABLE IF EXISTS Peers CASCADE;
+
+DROP PROCEDURE IF EXISTS pr_import_data_from_csv;
+DROP PROCEDURE IF EXISTS pr_export_data_from_csv;
+DROP PROCEDURE IF EXISTS fn_trg_timetracking_insert;
+DROP PROCEDURE IF EXISTS fn_trg_recommendations_insert;
+DROP FUNCTION IF EXISTS fn_trg_friends_insert;
+DROP FUNCTION IF EXISTS fn_trg_transferred_points_insert;
+DROP FUNCTION IF EXISTS fn_trg_p2p_insert1;
+DROP FUNCTION IF EXISTS fn_trg_p2p_insert2;
+DROP FUNCTION IF EXISTS fn_trg_verter_insert;
+DROP FUNCTION IF EXISTS fn_trg_checks_insert;

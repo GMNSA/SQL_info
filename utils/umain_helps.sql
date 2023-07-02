@@ -15,3 +15,11 @@ BEGIN
     INTO id;
 END;
 $$ language plpgsql;
+-- -------------------------------------------- --
+CREATE OR REPLACE FUNCTION fn_max_id(table_name TEXT, OUT id BIGINT) AS
+$$
+BEGIN
+    EXECUTE format('SELECT MAX(ID) FROM %s', table_name)
+    INTO id;
+END;
+$$ language plpgsql;

@@ -1,0 +1,7 @@
+START tests
+
+./run_test.sh
+
+./run_test.sh 1             OR           \i ./tests/tpart_1.sql
+./run_test.sh 2             OR           \i ./tests/tpart_2.sql
+./run_test.sh 3             OR           \i ./tests/tpart_3.sql
